@@ -2,8 +2,8 @@
 
 const benchmark = require('benchmark')
 const { URL, parse } = require('url')
-const parseUrl = require('.')
-const { URL: NURL } = parseUrl
+const urlParser = require('.')
+const { URL: NURL } = urlParser
 
 const suite = new benchmark.Suite()
 
@@ -16,10 +16,10 @@ suite
   .add('Nodejs url.parse', () => {
     parse(testUrl)
   })
-  .add('parseUrl from jQuery Mobile', () => {
-    parseUrl(testUrl)
+  .add('urlParser from jQuery Mobile', () => {
+    urlParser(testUrl)
   })
-  .add('parseUrl in WHATWG URL way', () => {
+  .add('urlParser in WHATWG URL way', () => {
     return new NURL(testUrl)
   })
   .on('cycle', (event) => {

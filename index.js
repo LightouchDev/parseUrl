@@ -3,7 +3,7 @@
 const punycode = require('punycode')
 
 /*
- *  parseUrl adapt from jQuery Mobile
+ *  urlParser adapt from jQuery Mobile
  */
 
 // This scary looking regular expression parses an absolute URL. When used with RegExp.exec()
@@ -24,8 +24,9 @@ const urlParseRE = /^\s*([^:/#?]+:)?(?:\/\/(?:([^:@/#?]+)(?::([^:@/#?]+))?@)?(([
 const isASCII = /^[\u0000-\u007f]*$/
 const preParse = /^([^:/#?]+:)\/\/(.*)/
 
-function parseUrl (url) {
+function urlParser (url) {
   if (typeof url !== 'string') throw new Error(`Invalid URL: ${url}`)
+
   if (!isASCII.test(url)) {
     url = preParse.exec(url)
     url = `${url[1]}//${punycode.toASCII(url[2])}`
@@ -55,6 +56,7 @@ function parseUrl (url) {
 
 function URL (input, base) {
   let url
+
   if (base !== undefined) {
     if (typeof base === 'string') {
       url = base
@@ -72,6 +74,7 @@ function URL (input, base) {
       throw new Error(`Invalid URL: ${input}`)
     }
   }
+
   if (!isASCII.test(url)) {
     url = preParse.exec(url)
     url = `${url[1]}//${punycode.toASCII(url[2])}`
@@ -94,5 +97,5 @@ function URL (input, base) {
   this.origin = `${matches[1]}//${matches[4]}`
 }
 
-module.exports = parseUrl
+module.exports = urlParser
 module.exports.URL = URL
