@@ -1,14 +1,14 @@
 {
   "name": "parseUrl",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "parseUrl adapt from jQuery Mobile",
   "main": "index.js",
   "author": "Miau Lightouch",
   "license": "MIT",
-  "dependencies": {
+  "devDependencies": {
     "benchmark": "^2.1.4"
   },
   "engines": {
-    "node": ">=6"
+    "node": ">=4.5"
   }
 }

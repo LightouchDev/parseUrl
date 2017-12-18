@@ -21,10 +21,10 @@
 const urlParseRE = /^\s*([^:/#?]+:)?(?:\/\/(?:([^:@/#?]+)(?::([^:@/#?]+))?@)?(([^:/#?\][]+|\[[^/\]@#?]+\])(?::([0-9]+))?))?(\/?(?:[^/?#]+\/+)*[^?#]*)(\?[^#]+)?(#.*)?/
 
 function parseUrl (url) {
-  if (typeof url !== 'string') throw new Error('Invalid URL')
+  if (typeof url !== 'string') throw new Error(`Invalid URL: ${url}`)
   const matches = urlParseRE.exec(url || '') || []
 
-  if (matches[1] === undefined) throw new Error('Invalid URL')
+  if (matches[1] === undefined) throw new Error(`Invalid URL: ${url}`)
 
   // Create an object that allows the caller to access the sub-matches
   // by name. Note that IE returns an empty string instead of undefined,
@@ -45,24 +45,24 @@ function parseUrl (url) {
   }
 }
 
-class URL {
-  constructor (url) {
-    if (typeof url !== 'string') throw new Error('Invalid URL')
-    const matches = urlParseRE.exec(url || '') || []
+function URL (url) {
+  if (typeof url !== 'string') throw new Error(`Invalid URL: ${url}`)
+  const matches = urlParseRE.exec(url || '') || []
 
-    if (matches[1] === undefined) throw new Error('Invalid URL')
-    ;[
-      this.href = '',
-      this.protocol = '',
-      this.username = '',
-      this.password = '',
-      this.host = '',
-      this.pathname = '',
-      this.search = '',
-      this.hash = ''
-    ] = matches
-    this.origin = `${matches[1]}//${matches[4]}`
-  }
+  if (matches[1] === undefined) throw new Error(`Invalid URL: ${url}`)
+
+  this.href = matches[0] || ''
+  this.protocol = matches[1] || ''
+  this.username = matches[2] || ''
+  this.password = matches[3] || ''
+  this.host = matches[4] || ''
+  this.hostname = matches[5] || ''
+  this.port = matches[6] || ''
+  this.pathname = matches[7] || ''
+  this.search = matches[8] || ''
+  this.hash = matches[9] || ''
+
+  this.origin = `${matches[1]}//${matches[4]}`
 }
 
 module.exports = parseUrl
