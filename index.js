@@ -52,7 +52,7 @@ class URL {
 
     if (matches[1] === undefined) throw new Error('Invalid URL')
     ;[
-      this.herf = '',
+      this.href = '',
       this.protocol = '',
       this.username = '',
       this.password = '',
