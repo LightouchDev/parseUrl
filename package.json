@@ -1,7 +1,7 @@
 {
-  "name": "parseUrl",
+  "name": "url-parser",
   "version": "0.1.0",
-  "description": "parseUrl adapt from jQuery Mobile",
+  "description": "url parser adapt from jQuery Mobile",
   "main": "index.js",
   "author": "Miau Lightouch",
   "license": "MIT",
