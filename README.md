@@ -6,15 +6,13 @@
 
 ### parseUrl(url)
 
-* url \<String>
+* url \<String> absolute url
 
 return a `WHATWG URL-like object`.
 
-### class: parseUrl.URL(url)
+### class: parseUrl.URL
 
-* url \<String>
-
-work like WHATWG URL as `new parseUrl.URL(url)`, and return a `WHATWG URL-like object`.
+same as [Node's WHATWG URL api](https://nodejs.org/dist/latest-v8.x/docs/api/url.html#url_the_whatwg_url_api), but without `URLSearchParams` class.
 
 ## Example
 

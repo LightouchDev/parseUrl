@@ -1,5 +1,7 @@
 'use strict'
 
+const punycode = require('punycode')
+
 /*
  *  parseUrl adapt from jQuery Mobile
  */
@@ -19,9 +21,15 @@
 //     [9]: #msg-content
 //
 const urlParseRE = /^\s*([^:/#?]+:)?(?:\/\/(?:([^:@/#?]+)(?::([^:@/#?]+))?@)?(([^:/#?\][]+|\[[^/\]@#?]+\])(?::([0-9]+))?))?(\/?(?:[^/?#]+\/+)*[^?#]*)(\?[^#]+)?(#.*)?/
+const isASCII = /^[\u0000-\u007f]*$/
+const preParse = /^([^:/#?]+:)\/\/(.*)/
 
 function parseUrl (url) {
   if (typeof url !== 'string') throw new Error(`Invalid URL: ${url}`)
+  if (!isASCII.test(url)) {
+    url = preParse.exec(url)
+    url = `${url[1]}//${punycode.toASCII(url[2])}`
+  }
   const matches = urlParseRE.exec(url || '') || []
 
   if (matches[1] === undefined) throw new Error(`Invalid URL: ${url}`)
@@ -45,11 +53,32 @@ function parseUrl (url) {
   }
 }
 
-function URL (url) {
-  if (typeof url !== 'string') throw new Error(`Invalid URL: ${url}`)
+function URL (input, base) {
+  let url
+  if (base !== undefined) {
+    if (typeof base === 'string') {
+      url = base
+    } else if (typeof base === 'object' && base.href !== undefined) {
+      url = input !== undefined && /^\/+(.*)$/.test(input)
+        ? base.href.replace(/\/*$/, '') + input.replace(/^\/+(.*)$/, '/$1') // combine url
+        : base.href
+    } else {
+      throw new Error(`Invalid base URL: ${base}`)
+    }
+  } else {
+    if (typeof input === 'string') {
+      url = input
+    } else {
+      throw new Error(`Invalid URL: ${input}`)
+    }
+  }
+  if (!isASCII.test(url)) {
+    url = preParse.exec(url)
+    url = `${url[1]}//${punycode.toASCII(url[2])}`
+  }
   const matches = urlParseRE.exec(url || '') || []
 
-  if (matches[1] === undefined) throw new Error(`Invalid URL: ${url}`)
+  if (matches[1] === undefined) throw new Error(`Invalid URL: ${input}`)
 
   this.href = matches[0] || ''
   this.protocol = matches[1] || ''
