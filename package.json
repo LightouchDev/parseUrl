@@ -1,0 +1,11 @@
+{
+  "name": "parseUrl",
+  "version": "0.0.1",
+  "description": "parseUrl adapt from jQuery Mobile",
+  "main": "index.js",
+  "author": "Miau Lightouch",
+  "license": "MIT",
+  "dependencies": {
+    "benchmark": "^2.1.4"
+  }
+}
