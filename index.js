@@ -50,7 +50,7 @@ function urlParser (url) {
     pathname: matches[7] || '',
     search: matches[8] || '',
     hash: matches[9] || '',
-    origin: `${matches[1]}//${matches[4]}` || ''
+    origin: `${matches[1]}//${matches[4] || ''}`
   }
 }
 
@@ -94,7 +94,7 @@ function URL (input, base) {
   this.search = matches[8] || ''
   this.hash = matches[9] || ''
 
-  this.origin = `${matches[1]}//${matches[4]}`
+  this.origin = `${matches[1]}//${matches[4] || ''}`
 }
 
 module.exports = urlParser
