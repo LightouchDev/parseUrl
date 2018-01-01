@@ -1,5 +1,6 @@
 'use strict'
 
+const path = require('path')
 const punycode = require('punycode')
 
 /*
@@ -23,12 +24,19 @@ const punycode = require('punycode')
 const urlParseRE = /^\s*([^:/#?]+:)?\/\/(?:(?:([^:@/#?]+)(?::([^:@/#?]+))?@)?(([^:/#?\][]+|\[[^/\]@#?]+\])(?::([0-9]+))?))?(\/?(?:[^/?#]+\/+)*[^?#]*)(\?[^#]+)?(#.*)?/
 const isASCII = /^[\u0000-\u007f]*$/
 const preParse = /^([^:/#?]+:)\/\/(.*)/
+const objectString = (() => {
+  const object = {}
+  return object.toString()
+})()
 
 function parse (url) {
   if (!isASCII.test(url)) {
     url = preParse.exec(url)
     url = `${url[1]}//${punycode.toASCII(url[2])}`
   }
+  url.replace(/[\u00A0-\u9999<>&]/gim, (i) => {
+    return `&#${i.charCodeAt(0)};`
+  })
   const matches = urlParseRE.exec(url || '') || []
   if (matches[1] === undefined) throw new Error(`Invalid URL: ${url}`)
 
@@ -52,7 +60,7 @@ function urlParser (url) {
     host: matches[4] || '',
     hostname: matches[5] || '',
     port: matches[6] || '',
-    pathname: matches[7] || '',
+    pathname: matches[7] ? path.posix.join(matches[7]) : '',
     search: matches[8] || '',
     hash: matches[9] || '',
     origin: `${matches[1]}//${matches[4] || ''}`
@@ -62,22 +70,28 @@ function urlParser (url) {
 function URL (input, base) {
   let url
 
-  if (base !== undefined) {
-    if (typeof base === 'string') {
-      url = base
-    } else if (typeof base === 'object' && base.href !== undefined) {
-      url = input !== undefined && /^\/+(.*)$/.test(input)
-        ? base.href.replace(/\/*$/, '') + input.replace(/^\/+(.*)$/, '/$1') // combine url
-        : base.href
+  if (typeof input === 'string') {
+    if (base !== undefined) {
+      if (typeof base === 'string') {
+        url = base
+      } else if (typeof base === 'object') {
+        let baseUrl
+        if (typeof base.origin === 'string' && base.origin) {
+          baseUrl = base.origin
+        }
+        url = baseUrl.replace(/\/?$/, '') + input.replace(/^\/?(.*)$/, '/$1') // combine url
+      } else {
+        throw new Error(`Invalid base URL: ${base}`)
+      }
     } else {
-      throw new Error(`Invalid base URL: ${base}`)
+      url = input
+    }
+  } else if (typeof input === 'object' && typeof input.toString === 'function') {
+    if (input.toString() !== objectString) {
+      url = input.toString()
     }
   } else {
-    if (typeof input === 'string') {
-      url = input
-    } else {
-      throw new Error(`Invalid URL: ${input}`)
-    }
+    throw new Error(`Invalid URL: ${input}`)
   }
 
   const matches = parse(url)
@@ -89,7 +103,7 @@ function URL (input, base) {
   this.host = matches[4] || ''
   this.hostname = matches[5] || ''
   this.port = matches[6] || ''
-  this.pathname = matches[7] || ''
+  this.pathname = matches[7] ? path.posix.join(matches[7]) : ''
   this.search = matches[8] || ''
   this.hash = matches[9] || ''
 
