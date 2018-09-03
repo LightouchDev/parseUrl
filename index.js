@@ -24,10 +24,7 @@ const punycode = require('punycode')
 const urlParseRE = /^\s*([^:/#?]+:)?\/\/(?:(?:([^:@/#?]+)(?::([^:@/#?]+))?@)?(([^:/#?\][]+|\[[^/\]@#?]+\])(?::([0-9]+))?))?(\/?(?:[^/?#]+\/+)*[^?#]*)(\?[^#]+)?(#.*)?/
 const isASCII = /^[\u0000-\u007f]*$/
 const preParse = /^([^:/#?]+:)\/\/(.*)/
-const objectString = (() => {
-  const object = {}
-  return object.toString()
-})()
+const objectString = Object.prototype.toString()
 
 function parse (url) {
   if (!isASCII.test(url)) {
@@ -66,48 +63,50 @@ function urlParser (url) {
     origin: `${matches[1]}//${matches[4] || ''}`
   }
 }
-
-function URL (input, base) {
-  let url
-
-  if (typeof input === 'string') {
-    if (base !== undefined) {
-      if (typeof base === 'string') {
-        url = base
-      } else if (typeof base === 'object') {
-        let baseUrl
-        if (typeof base.origin === 'string' && base.origin) {
-          baseUrl = base.origin
+class URL {
+  constructor (input, base) {
+    let url
+  
+    if (typeof input === 'string') {
+      if (base !== undefined) {
+        if (typeof base === 'string') {
+          url = base
+        } else if (typeof base === 'object') {
+          let baseUrl
+          if (typeof base.origin === 'string' && base.origin) {
+            baseUrl = base.origin
+          }
+          url = baseUrl.replace(/\/?$/, '') + input.replace(/^\/?(.*)$/, '/$1') // combine url
+        } else {
+          throw new Error(`Invalid base URL: ${base}`)
         }
-        url = baseUrl.replace(/\/?$/, '') + input.replace(/^\/?(.*)$/, '/$1') // combine url
       } else {
-        throw new Error(`Invalid base URL: ${base}`)
+        url = input
+      }
+    } else if (typeof input === 'object' && typeof input.toString === 'function') {
+      const result = input.toString()
+      if (result !== objectString) {
+        url = result
       }
     } else {
-      url = input
+      throw new Error(`Invalid URL: ${input}`)
     }
-  } else if (typeof input === 'object' && typeof input.toString === 'function') {
-    if (input.toString() !== objectString) {
-      url = input.toString()
-    }
-  } else {
-    throw new Error(`Invalid URL: ${input}`)
-  }
-
-  const matches = parse(url)
-
-  this.href = matches[0] || ''
-  this.protocol = matches[1] || ''
-  this.username = matches[2] || ''
-  this.password = matches[3] || ''
-  this.host = matches[4] || ''
-  this.hostname = matches[5] || ''
-  this.port = matches[6] || ''
-  this.pathname = matches[7] ? path.posix.join(matches[7]) : ''
-  this.search = matches[8] || ''
-  this.hash = matches[9] || ''
-
-  this.origin = `${matches[1]}//${matches[4] || ''}`
+  
+    const matches = parse(url)
+  
+    this.href = matches[0] || ''
+    this.protocol = matches[1] || ''
+    this.username = matches[2] || ''
+    this.password = matches[3] || ''
+    this.host = matches[4] || ''
+    this.hostname = matches[5] || ''
+    this.port = matches[6] || ''
+    this.pathname = matches[7] ? path.posix.join(matches[7]) : ''
+    this.search = matches[8] || ''
+    this.hash = matches[9] || ''
+  
+    this.origin = `${matches[1]}//${matches[4] || ''}`
+  }  
 }
 
 module.exports = urlParser
