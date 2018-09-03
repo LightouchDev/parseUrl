@@ -12,6 +12,6 @@
     "node": ">=4.5"
   },
   "dependencies": {
-    "punycode": "^2.1.0"
+    "punycode": "^2.1.1"
   }
 }
